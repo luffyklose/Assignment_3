@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class Board : MonoBehaviour
 {
@@ -27,11 +28,20 @@ public class Board : MonoBehaviour
     private int marksCount = 0;
 
     public GameObject networkedClient;
-    public GameManager gameManager;
+    public GameObject gameManager;
+    public Text turnTip;
 
     // Start is called before the first frame update
     void Start()
     {
+        GameObject[] allObjects = FindObjectsOfType<GameObject>();
+
+        foreach (var go in allObjects)
+        {
+            if (go.name == "GameManager")
+                gameManager = go;
+        }
+        
         cam = Camera.main ;
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.enabled = false;
@@ -39,7 +49,8 @@ public class Board : MonoBehaviour
         currentMark = BoxState.X;
         boxStates = new BoxState[9];
 
-        canPlay = true;
+        canPlay = gameManager.GetComponent<GameManager>().getCanPlay();
+        SetGame(canPlay);
     }
 
     // Update is called once per frame
@@ -54,7 +65,7 @@ public class Board : MonoBehaviour
             {
                 int index = hit.GetComponent<Box>().index;
                 DrawMark(index,true);
-                gameManager.MarkDrawed(index);
+                gameManager.GetComponent<GameManager>().MarkDrawed(index);
                 //MarkBox(hit.GetComponent<Box>());
             }
         }
@@ -147,6 +158,7 @@ public class Board : MonoBehaviour
     public void EnterPlayerTurn()
     {
         canPlay = true;
+        turnTip.text = "Your Turn";
     }
 
     private void SetGame(bool isFirstPlayer)
@@ -214,6 +226,7 @@ public class Board : MonoBehaviour
             }
 
             canPlay = false;
+            turnTip.text = "Opponent Turn";
         }
     }
 }

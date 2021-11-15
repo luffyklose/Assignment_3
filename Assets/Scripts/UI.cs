@@ -7,7 +7,8 @@ using UnityEngine.UI;
 public class UI : MonoBehaviour
 {
     [Header("UI References :")] 
-    [SerializeField] private GameObject uiCanvas;
+    [SerializeField] private GameObject gameOverCanvas;
+    [SerializeField] private GameObject inGameCanvas;
     [SerializeField] private Text uiWinnerText;
     [SerializeField] private Button uiRestartButton;
 
@@ -18,7 +19,7 @@ public class UI : MonoBehaviour
         uiRestartButton.onClick.AddListener(() => SceneManager.LoadScene(0));
         board.OnWinAction += OnWinEvent;
 
-        uiCanvas.SetActive (false) ;
+        gameOverCanvas.SetActive (false) ;
     }
 
     // Update is called once per frame
@@ -38,7 +39,8 @@ public class UI : MonoBehaviour
             uiWinnerText.text = mark.ToString() + " Wins";
         }
 
-        uiCanvas.SetActive (true) ;
+        gameOverCanvas.SetActive(true);
+        inGameCanvas.SetActive(false);
     }
 
     private void OnDestroy () 

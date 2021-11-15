@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     GameObject findGameSessionButton, placeHolderGameButton;
     GameObject infoText1, infoText2;
     GameObject board;
+    Board newBoard;
 
     private void Awake()
     {
@@ -93,8 +94,40 @@ public class GameManager : MonoBehaviour
         // {
         //     ChangeGameStates(GameStates.PlayingTicTacToe);
         // }
+        if (SceneManager.GetActiveScene().name == "StartScene" && newBoard == null)
+        {
+            FindBoard();
+        }
     }
 
+    public void FindBoard()
+    {
+        Debug.Log("Start finding board");
+        /*Board[] allBoards = FindObjectsOfType<Board>();
+        
+        foreach (var go in allBoards)
+        {
+            Debug.Log("1 time");
+            if (go.name == "Board")
+            {
+                newBoard = go;
+                Debug.Log("Find Board");
+            }
+        }*/
+        
+        GameObject[] allObjects = FindObjectsOfType<GameObject>();
+        
+        foreach (var go in allObjects)
+        {
+            //Debug.Log("1 time");
+            if (go.name == "Board")
+            {
+                board = go;
+                Debug.Log("Find Board");
+            }
+        }
+    }
+    
     private void SubmitButtonPressed()
     {
         string n = inputFieldUserName.GetComponent<InputField>().text;
@@ -120,17 +153,20 @@ public class GameManager : MonoBehaviour
     
     private void FindGameSessionButtonPressed()
     {
+        Debug.Log("Find Room Sent");
         networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(ClientToServerSignifiers.AddToGameSessionQueue + "");
         ChangeGameStates(GameStates.WaitingForMatch);
     }
     
     private void PlaceHolderGameButtonPressed()
     {
+        Debug.Log("Start Game Sent");
         networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(ClientToServerSignifiers.TicTacToePlay + "");
     }
 
     public void MarkDrawed(int location)
     {
+        Debug.Log("Mark at " + location);
         string l = location.ToString();
         networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(ClientToServerSignifiers.DrawMark + "," + l);
     }
@@ -175,7 +211,11 @@ public class GameManager : MonoBehaviour
         {
             placeHolderGameButton.SetActive(true);
         }
-       
+    }
+
+    public bool getCanPlay()
+    {
+        return networkedClient.GetComponent<NetworkedClient>().getCanPlay();
     }
 
     public static class ClientToServerSignifiers

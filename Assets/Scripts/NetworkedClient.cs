@@ -17,6 +17,7 @@ public class NetworkedClient : MonoBehaviour
     byte error;
     bool isConnected = false;
     int ourClientID;
+    private bool canPlay;
 
     GameObject gameManager;
 
@@ -132,18 +133,39 @@ public class NetworkedClient : MonoBehaviour
         }
         else if (signifier == ServerToClientSignifiers.GameSessionStarted)
         {
+            Debug.Log("Find Room");
             gameManager.GetComponent<GameManager>().ChangeGameStates(GameManager.GameStates.PlayingTicTacToe);
         }
         else if (signifier == ServerToClientSignifiers.OpponentTicTacToePlay)
         {
             Debug.Log("Our next action no longer beckons");
+            int temp = int.Parse(csv[1]);
+            Debug.Log(temp);
+            if (temp == 1)
+            {
+                canPlay = true;
+            }
+            else if (temp == 0)
+            {
+                canPlay = false;
+            }
+            else
+            {
+                Debug.Log("CanPlay get error");
+            }
             SceneManager.LoadScene("GameScene");
+            gameManager.GetComponent<GameManager>().FindBoard();
         }
         else if (signifier == ServerToClientSignifiers.DrawMark)
         {
             Debug.Log("Enemy draw mark at box " + csv[1]);
             gameManager.GetComponent<GameManager>().EnemyDrawMark(int.Parse(csv[1]));
         }
+    }
+
+    public bool getCanPlay()
+    {
+        return canPlay;
     }
 
     public bool IsConnected()
