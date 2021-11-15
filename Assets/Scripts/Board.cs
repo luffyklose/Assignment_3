@@ -17,11 +17,18 @@ public class Board : MonoBehaviour
 
     public UnityAction<BoxState> OnWinAction;
     public BoxState[] boxStates;
+    public List<Box> boxList;
     private Camera cam;
     private BoxState currentMark;
+    private BoxState playerMark;
+    private BoxState enemyMark;
     private bool canPlay;
     private LineRenderer lineRenderer;
     private int marksCount = 0;
+
+    public GameObject networkedClient;
+    public GameManager gameManager;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -45,7 +52,10 @@ public class Board : MonoBehaviour
 
             if (hit)
             {
-                MarkBox(hit.GetComponent<Box>());
+                int index = hit.GetComponent<Box>().index;
+                DrawMark(index,true);
+                gameManager.MarkDrawed(index);
+                //MarkBox(hit.GetComponent<Box>());
             }
         }
     }
@@ -131,6 +141,79 @@ public class Board : MonoBehaviour
         else
         {
             currentMark = BoxState.X;
+        }
+    }
+
+    public void EnterPlayerTurn()
+    {
+        canPlay = true;
+    }
+
+    private void SetGame(bool isFirstPlayer)
+    {
+        if (isFirstPlayer)
+        {
+            playerMark = BoxState.X;
+            enemyMark = BoxState.O;
+        }
+        else
+        {
+            playerMark = BoxState.O;
+            enemyMark = BoxState.X;
+        }
+    }
+
+    public void DrawMark(int location, bool isPlayer)
+    {
+        if (boxStates[location] != BoxState.Empty)
+        {
+            if (isPlayer)
+            {
+                currentMark = playerMark;
+            }
+            else
+            {
+                currentMark = enemyMark;
+            }
+
+            boxStates[location] = currentMark;
+            if (currentMark == BoxState.X)
+            {
+                boxList[location].MarkBox(spriteX,BoxState.X);
+            }
+            else if (currentMark == BoxState.O)
+            {
+                boxList[location].MarkBox(spriteO, BoxState.O);
+            }
+            
+            marksCount++;
+
+            bool won = CheckWin();
+            if (won)
+            {
+                if (OnWinAction != null)
+                {
+                    OnWinAction.Invoke(currentMark);
+                    Debug.Log(currentMark+" win");
+                }
+
+                canPlay = false;
+                return;
+            }
+
+            if (marksCount == 9)
+            {
+                if (OnWinAction != null)
+                {
+                    OnWinAction.Invoke(BoxState.Empty);
+                    Debug.Log("Nobody wins");
+                }
+
+                canPlay = false;
+                return;
+            }
+
+            canPlay = false;
         }
     }
 }

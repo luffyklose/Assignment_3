@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 79588280}
   - component: {fileID: 79588282}
   m_Layer: 6
-  m_Name: Box
+  m_Name: Box2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -318,7 +318,7 @@ GameObject:
   - component: {fileID: 382410915}
   - component: {fileID: 382410917}
   m_Layer: 6
-  m_Name: Box
+  m_Name: Box5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -644,7 +644,7 @@ GameObject:
   - component: {fileID: 845173560}
   - component: {fileID: 845173562}
   m_Layer: 6
-  m_Name: Box
+  m_Name: Box4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -760,7 +760,7 @@ GameObject:
   - component: {fileID: 1081288037}
   - component: {fileID: 1081288039}
   m_Layer: 6
-  m_Name: Box
+  m_Name: Box6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -901,7 +901,7 @@ GameObject:
   - component: {fileID: 1445748665}
   - component: {fileID: 1445748667}
   m_Layer: 6
-  m_Name: Box
+  m_Name: Box3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1138,7 +1138,7 @@ GameObject:
   - component: {fileID: 1574584351}
   - component: {fileID: 1574584353}
   m_Layer: 6
-  m_Name: Box
+  m_Name: Box8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1254,7 +1254,7 @@ GameObject:
   - component: {fileID: 1646292730}
   - component: {fileID: 1646292732}
   m_Layer: 6
-  m_Name: Box
+  m_Name: Box9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1550,7 +1550,7 @@ GameObject:
   - component: {fileID: 1930695722}
   - component: {fileID: 1930695724}
   m_Layer: 6
-  m_Name: Box
+  m_Name: Box7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1690,6 +1690,16 @@ MonoBehaviour:
   spriteX: {fileID: 21300000, guid: 6eafa420112639240bfdfa264102a109, type: 3}
   spriteO: {fileID: 21300000, guid: b566c5c27e3a9c64aa8982b3beac06ff, type: 3}
   boxStates: 
+  boxList:
+  - {fileID: 1154632738}
+  - {fileID: 79588282}
+  - {fileID: 1445748667}
+  - {fileID: 845173562}
+  - {fileID: 382410917}
+  - {fileID: 1081288039}
+  - {fileID: 1930695724}
+  - {fileID: 1574584353}
+  - {fileID: 1646292732}
 --- !u!120 &1960671486
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -1873,7 +1883,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1147029617344508304, guid: b23baea1045a27b4ca47bdde8d940642, type: 3}
       propertyPath: m_Name
-      value: Box
+      value: Box1
       objectReference: {fileID: 0}
     - target: {fileID: 1147029617344508304, guid: b23baea1045a27b4ca47bdde8d940642, type: 3}
       propertyPath: m_Layer
