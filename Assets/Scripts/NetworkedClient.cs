@@ -154,10 +154,10 @@ public class NetworkedClient : MonoBehaviour
                 Debug.Log("CanPlay get error");
             }
             SceneManager.LoadScene("GameScene");
-            gameManager.GetComponent<GameManager>().FindBoard();
+            //gameManager.GetComponent<GameManager>().FindGameSceneObject();
             if (canPlay)
             {
-                gameManager.GetComponent<GameManager>().FindBoard();
+                gameManager.GetComponent<GameManager>().FindGameSceneObject();
                 gameManager.GetComponent<GameManager>().getBoard().GetComponent<Board>().EnterPlayerTurn();
             }
         }
@@ -173,7 +173,7 @@ public class NetworkedClient : MonoBehaviour
             {
                 Debug.Log("Join a room to observe");
                 SceneManager.LoadScene("GameScene");
-                gameManager.GetComponent<GameManager>().FindBoard();
+                gameManager.GetComponent<GameManager>().FindGameSceneObject();
             }
             else if (i == 1)
             {
@@ -229,6 +229,10 @@ public class NetworkedClient : MonoBehaviour
                 gameManager.GetComponent<GameManager>().AddStep(location, state);
             }
         }
+        else if (signifier == ServerToClientSignifiers.SendChatMessage)
+        {
+            gameManager.GetComponent<GameManager>().SetEnemyChat(csv[1]);
+        }
     }
 
     public bool getCanPlay()
@@ -252,6 +256,7 @@ public class NetworkedClient : MonoBehaviour
         public const int AskForGSList = 7;
         public const int AskJoinGS = 8;
         public const int JoinRandomRoom = 9;
+        public const int SendChatMessage = 10;
     }
 
     public static class ServerToClientSignifiers
@@ -265,6 +270,7 @@ public class NetworkedClient : MonoBehaviour
         public const int NoRoomCanJoin = 7;
         public const int DrawMarkOnObserver = 8;
         public const int GameOver = 9;
+        public const int SendChatMessage = 10;
     }
  
     public static class LoginResponses

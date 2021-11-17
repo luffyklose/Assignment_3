@@ -13,17 +13,15 @@ public class GameManager : MonoBehaviour
     GameObject findGameSessionButton, placeHolderGameButton,observerButton;
     GameObject infoText1, infoText2;
     GameObject board;
-    Board newBoard;
-    //public Step[] steps = new Step[9];
+    private GameObject myChat, enemyChat, myChatText, enemyChatText, chatInput, sendButton;
     private List<Step> stepList;
+
+    private float playerChatCounter;
+    private float enemyChatCounter;
 
     private void Awake()
     {
         DontDestroyOnLoad(this);
-        /*for (int i = 0; i < 9; i++)
-        {
-            steps[i] = new Step();
-        }*/
         stepList = new List<Step>();
     }
 
@@ -106,25 +104,37 @@ public class GameManager : MonoBehaviour
         // }
         if (SceneManager.GetActiveScene().name == "GameScene" && board == null)
         {
-            FindBoard();
+            FindGameSceneObject();
+        }
+
+        if (SceneManager.GetActiveScene().name == "GameScene")
+        {
+            if (myChat.activeSelf)
+            {
+                playerChatCounter += Time.deltaTime;
+                if (playerChatCounter >= 5.0)
+                {
+                    myChat.SetActive(false);
+                    playerChatCounter = 0.0f;
+                }
+            }
+    
+            if (enemyChat.activeSelf)
+            {
+                enemyChatCounter += Time.deltaTime;
+                if (enemyChatCounter >= 5.0)
+                {
+                    enemyChat.SetActive(false);
+                    enemyChatCounter = 0.0f;
+                }
+            }
         }
     }
 
-    public void FindBoard()
+    public void FindGameSceneObject()
     {
         Debug.Log("Start finding board");
-        /*Board[] allBoards = FindObjectsOfType<Board>();
-        
-        foreach (var go in allBoards)
-        {
-            Debug.Log("1 time");
-            if (go.name == "Board")
-            {
-                newBoard = go;
-                Debug.Log("Find Board");
-            }
-        }*/
-        
+
         GameObject[] allObjects = FindObjectsOfType<GameObject>();
         
         foreach (GameObject go in allObjects)
@@ -135,7 +145,36 @@ public class GameManager : MonoBehaviour
                 board = go;
                 //Debug.Log("Find Board");
             }
+            else if (go.name == "MyChat")
+            {
+                myChat = go;
+            }
+            else if (go.name == "EnemyChat")
+            {
+                enemyChat = go;
+            }
+            else if (go.name == "ChatInput")
+            {
+                chatInput = go;
+            }
+            else if (go.name == "SendButton")
+            {
+                sendButton = go;
+            }
+            else if (go.name == "MyChatText")
+            {
+                myChatText = go;
+            }
+            else if (go.name == "EnemyChatText")
+            {
+                enemyChatText = go;
+            }
         }
+        
+        sendButton.GetComponent<Button>().onClick.AddListener(SendChatMessage);
+
+        myChat.SetActive(false);
+        enemyChat.SetActive(false);
     }
     
     private void SubmitButtonPressed()
@@ -290,6 +329,43 @@ public class GameManager : MonoBehaviour
     {
         stepList = new List<Step>();
     }
+    
+    private void SendChatMessage()
+    {
+        string c = chatInput.GetComponent<InputField>().text;
+        if (c.Length != 0)
+        {
+            networkedClient.GetComponent<NetworkedClient>()
+                .SendMessageToHost(ClientToServerSignifiers.SendChatMessage + "," + c);
+            if (myChat.activeSelf)
+            {
+                myChatText.GetComponent<Text>().text = c;
+                playerChatCounter = 0.0f;
+            }
+            else
+            {
+                myChat.SetActive(true);
+                myChatText.GetComponent<Text>().text = c;
+                playerChatCounter = 0.0f;
+            }
+            chatInput.GetComponent<InputField>().text = "";
+        }
+    }
+
+    public void SetEnemyChat(String message)
+    {
+        if (enemyChat.activeSelf)
+        {
+            enemyChatText.GetComponent<Text>().text = message;
+            enemyChatCounter = 0.0f;
+        }
+        else
+        {
+            enemyChat.SetActive(true);
+            enemyChatText.GetComponent<Text>().text = message;
+            enemyChatCounter = 0.0f;
+        }
+    }
 
     public class Step
     {
@@ -358,6 +434,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
+   
+
     public static class ClientToServerSignifiers
     {
         public const int Login = 1;
@@ -369,6 +447,7 @@ public class GameManager : MonoBehaviour
         public const int AskForGSList = 7;
         public const int AskJoinGS = 8;
         public const int JoinRandomRoom = 9;
+        public const int SendChatMessage = 10;
     }
 
     public static class ServerToClientSignifiers
@@ -382,6 +461,7 @@ public class GameManager : MonoBehaviour
         public const int NoRoomCanJoin = 7;
         public const int DrawMarkOnObserver = 8;
         public const int GameOver = 9;
+        public const int SendChatMessage = 10;
     }
  
     public static class LoginResponses
