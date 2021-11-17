@@ -10,14 +10,21 @@ public class GameManager : MonoBehaviour
 {
     GameObject inputFieldUserName, inputFieldPassword, buttonSubmit, toggleLogin, toggleCreate;
     GameObject networkedClient;
-    GameObject findGameSessionButton, placeHolderGameButton;
+    GameObject findGameSessionButton, placeHolderGameButton,observerButton;
     GameObject infoText1, infoText2;
     GameObject board;
     Board newBoard;
+    //public Step[] steps = new Step[9];
+    private List<Step> stepList;
 
     private void Awake()
     {
         DontDestroyOnLoad(this);
+        /*for (int i = 0; i < 9; i++)
+        {
+            steps[i] = new Step();
+        }*/
+        stepList = new List<Step>();
     }
 
     void Start()
@@ -26,7 +33,7 @@ public class GameManager : MonoBehaviour
         {
             GameObject[] allObjs = FindObjectsOfType<GameObject>();
             
-                    foreach (var go in allObjs)
+                    foreach (GameObject go in allObjs)
                     {
                         if (go.name == "inputFieldUserName")
                             inputFieldUserName = go;
@@ -48,6 +55,8 @@ public class GameManager : MonoBehaviour
                             infoText1 = go;
                         else if (go.name == "InfoText2")
                             infoText2 = go;
+                        else if (go.name == "ObserverButton")
+                            observerButton = go;
                     }
                     
                     buttonSubmit.GetComponent<Button>().onClick.AddListener(SubmitButtonPressed); 
@@ -55,7 +64,8 @@ public class GameManager : MonoBehaviour
                     toggleLogin.GetComponent<Toggle>().onValueChanged.AddListener(ToggleLoginValueChanged);
                     
                     findGameSessionButton.GetComponent<Button>().onClick.AddListener(FindGameSessionButtonPressed); 
-                    placeHolderGameButton.GetComponent<Button>().onClick.AddListener(PlaceHolderGameButtonPressed); 
+                    placeHolderGameButton.GetComponent<Button>().onClick.AddListener(PlaceHolderGameButtonPressed);
+                    observerButton.GetComponent<Button>().onClick.AddListener(ObserverButtonPressed);
                     
                     ChangeGameStates(GameStates.login);
         }
@@ -63,7 +73,7 @@ public class GameManager : MonoBehaviour
         {
             GameObject[] allObjs = FindObjectsOfType<GameObject>();
             
-            foreach (var go in allObjs)
+            foreach (GameObject go in allObjs)
             {
                if (go.name == "networkedClient")
                     networkedClient = go;
@@ -94,7 +104,7 @@ public class GameManager : MonoBehaviour
         // {
         //     ChangeGameStates(GameStates.PlayingTicTacToe);
         // }
-        if (SceneManager.GetActiveScene().name == "StartScene" && newBoard == null)
+        if (SceneManager.GetActiveScene().name == "GameScene" && board == null)
         {
             FindBoard();
         }
@@ -117,13 +127,13 @@ public class GameManager : MonoBehaviour
         
         GameObject[] allObjects = FindObjectsOfType<GameObject>();
         
-        foreach (var go in allObjects)
+        foreach (GameObject go in allObjects)
         {
             //Debug.Log("1 time");
             if (go.name == "Board")
             {
                 board = go;
-                Debug.Log("Find Board");
+                //Debug.Log("Find Board");
             }
         }
     }
@@ -162,19 +172,45 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Start Game Sent");
         networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(ClientToServerSignifiers.TicTacToePlay + "");
+        stepList = new List<Step>();
     }
 
-    public void MarkDrawed(int location)
+    private void ObserverButtonPressed()
+    {
+        Debug.Log("Random a room");
+        networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(ClientToServerSignifiers.JoinRandomRoom+"");
+        stepList = new List<Step>();
+    }
+
+    public void GameOver()
+    {
+        Debug.Log("Game Over");
+        networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(ClientToServerSignifiers.GameOver + "");
+    }
+
+    public void MarkDrawed(int location,BoxState state)
     {
         Debug.Log("Mark at " + location);
         string l = location.ToString();
-        networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(ClientToServerSignifiers.DrawMark + "," + l);
+        string s = (-1).ToString();
+        if (state == BoxState.X)
+        {
+            s = 1.ToString();
+        }
+        else if (state == BoxState.O)
+        {
+            s = 0.ToString();
+        }
+
+        networkedClient.GetComponent<NetworkedClient>()
+            .SendMessageToHost(ClientToServerSignifiers.DrawMark + "," + l + "," + s);
     }
 
     public void EnemyDrawMark(int location)
     {
         board.GetComponent<Board>().DrawMark(location,false);
-        board.GetComponent<Board>().EnterPlayerTurn();
+        if(!board.GetComponent<Board>().CheckGameOver())
+            board.GetComponent<Board>().EnterPlayerTurn();
     }
 
     public void ChangeGameStates(int newState)
@@ -188,6 +224,7 @@ public class GameManager : MonoBehaviour
         placeHolderGameButton.SetActive(false);
         infoText1.SetActive(false);
         infoText2.SetActive(false);
+        observerButton.SetActive(false);
 
         if (newState == GameStates.login)
         {
@@ -202,10 +239,12 @@ public class GameManager : MonoBehaviour
         else if (newState == GameStates.MainMenu)
         {
             findGameSessionButton.SetActive(true);
+            observerButton.SetActive(true);
         }
         else if (newState == GameStates.WaitingForMatch)
         {
-            
+            observerButton.SetActive(false);
+            infoText1.SetActive(true);
         }
         else if (newState == GameStates.PlayingTicTacToe)
         {
@@ -218,6 +257,107 @@ public class GameManager : MonoBehaviour
         return networkedClient.GetComponent<NetworkedClient>().getCanPlay();
     }
 
+    public GameObject getBoard()
+    {
+        return board;
+    }
+
+    public List<Step> GetStepList()
+    {
+        return stepList;
+    }
+
+    public bool IsStepListEmpty()
+    {
+        if (stepList.Count > 0)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    public void AddStep(int location, BoxState state)
+    {
+        int count = stepList.Count;
+        stepList.Add(new Step(count,location,state));
+        Debug.Log("Add Step " + location + " " + state);
+    }
+
+    public void ClearStepList()
+    {
+        stepList = new List<Step>();
+    }
+
+    public class Step
+    {
+        private int order;
+        private int location;
+        private BoxState state;
+
+        public Step()
+        {
+            order = -1;
+            location = -1;
+            state = BoxState.Empty;
+        }
+
+        public Step(int order, int location, BoxState state)
+        {
+            this.order = order;
+            this.location = location;
+            this.state = state;
+        }
+
+            public void SetValue(int order, int location, BoxState state)
+        {
+            this.order = order;
+            this.location = location;
+            this.state = state;
+        }
+
+        public int Order
+        {
+            get
+            {
+                return order;
+            }
+
+            set
+            {
+                order = value;
+            }
+        }
+
+        public int Location
+        {
+            get
+            {
+                return location;
+            }
+
+            set
+            {
+                location = value;
+            }
+        }
+
+        public BoxState State
+        {
+            get
+            {
+                return state;
+            }
+
+            set
+            {
+                state = value;
+            }
+        }
+    }
+
     public static class ClientToServerSignifiers
     {
         public const int Login = 1;
@@ -225,11 +365,23 @@ public class GameManager : MonoBehaviour
         public const int AddToGameSessionQueue = 3;
         public const int TicTacToePlay = 4;
         public const int DrawMark = 5;
+        public const int GameOver = 6;
+        public const int AskForGSList = 7;
+        public const int AskJoinGS = 8;
+        public const int JoinRandomRoom = 9;
     }
 
     public static class ServerToClientSignifiers
     {
         public const int LoginResponse = 1;
+        public const int GameSessionStarted = 2;
+        public const int OpponentTicTacToePlay = 3;
+        public const int DrawMark = 4;
+        public const int GSList = 5;
+        public const int JoiningRoom = 6;
+        public const int NoRoomCanJoin = 7;
+        public const int DrawMarkOnObserver = 8;
+        public const int GameOver = 9;
     }
  
     public static class LoginResponses
@@ -246,5 +398,8 @@ public class GameManager : MonoBehaviour
         public const int MainMenu = 2;
         public const int WaitingForMatch = 3;
         public const int PlayingTicTacToe = 4;
+        public const int MyTurn = 5;
+        public const int EnemyTurn = 6;
+        public const int ReadGSList = 7;
     }
 }

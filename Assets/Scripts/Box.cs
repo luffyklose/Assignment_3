@@ -39,4 +39,11 @@ public class Box : MonoBehaviour
 
         GetComponent<CircleCollider2D>().enabled = false;
     }
+
+    public void clearBox()
+    {
+        isEmpty = true;
+        this.state = BoxState.Empty;
+        spriteRenderer.sprite = null;
+    }
 }

@@ -11,12 +11,14 @@ public class UI : MonoBehaviour
     [SerializeField] private GameObject inGameCanvas;
     [SerializeField] private Text uiWinnerText;
     [SerializeField] private Button uiRestartButton;
+    [SerializeField] private Button uiReplayBUtton;
 
     [SerializeField] private Board board;
     // Start is called before the first frame update
     void Start()
     {
         uiRestartButton.onClick.AddListener(() => SceneManager.LoadScene(0));
+        uiReplayBUtton.onClick.AddListener(StartReplay);
         board.OnWinAction += OnWinEvent;
 
         gameOverCanvas.SetActive (false) ;
@@ -47,5 +49,10 @@ public class UI : MonoBehaviour
     {
         uiRestartButton.onClick.RemoveAllListeners () ;
         board.OnWinAction -= OnWinEvent ;
+    }
+
+    private void StartReplay()
+    {
+        board.StartReplay();
     }
 }
