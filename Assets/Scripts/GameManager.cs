@@ -13,7 +13,16 @@ public class GameManager : MonoBehaviour
     GameObject findGameSessionButton, placeHolderGameButton,observerButton;
     GameObject infoText1, infoText2;
     GameObject board;
-    private GameObject myChat, enemyChat, myChatText, enemyChatText, chatInput, sendButton;
+    private GameObject myChat,
+        enemyChat,
+        myChatText,
+        enemyChatText,
+        chatInput,
+        sendButton,
+        hiButton,
+        sorryButton,
+        ggButton,
+        thanksButton;
     private List<Step> stepList;
 
     private float playerChatCounter;
@@ -169,9 +178,45 @@ public class GameManager : MonoBehaviour
             {
                 enemyChatText = go;
             }
+            else if (go.name == "HiButton")
+            {
+                hiButton = go;
+            }
+            else if (go.name == "SorryButton")
+            {
+                sorryButton = go;
+            }
+            else if (go.name == "GGButton")
+            {
+                ggButton = go;
+            }
+            else if (go.name == "ThanksButton")
+            {
+                thanksButton = go;
+            }
         }
         
-        sendButton.GetComponent<Button>().onClick.AddListener(SendChatMessage);
+        //sendButton.GetComponent<Button>().onClick.AddListener(SendChatMessage);
+        sendButton.GetComponent<Button>().onClick.AddListener(()=>
+        {
+            SendChatMessage();
+        });
+        hiButton.GetComponent<Button>().onClick.AddListener(()=>
+        {
+            SendChatMessage("Hi");
+        });
+        sorryButton.GetComponent<Button>().onClick.AddListener(()=>
+        {
+            SendChatMessage("Sorry");
+        });
+        ggButton.GetComponent<Button>().onClick.AddListener(()=>
+        {
+            SendChatMessage("GG");
+        });
+        thanksButton.GetComponent<Button>().onClick.AddListener(()=>
+        {
+            SendChatMessage("Thanks");
+        });
 
         myChat.SetActive(false);
         enemyChat.SetActive(false);
@@ -330,9 +375,18 @@ public class GameManager : MonoBehaviour
         stepList = new List<Step>();
     }
     
-    private void SendChatMessage()
+    private void SendChatMessage(string content="")
     {
-        string c = chatInput.GetComponent<InputField>().text;
+        string c;
+        if (content.Length == 0)
+        {
+            c = chatInput.GetComponent<InputField>().text;
+        }
+        else
+        {
+            c = content;
+        }
+        
         if (c.Length != 0)
         {
             networkedClient.GetComponent<NetworkedClient>()
