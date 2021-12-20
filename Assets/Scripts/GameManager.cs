@@ -8,9 +8,9 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    GameObject inputFieldUserName, inputFieldPassword, buttonSubmit, toggleLogin, toggleCreate;
+    GameObject inputFieldUserName, inputFieldPassword, buttonSubmit, toggleLogin, toggleCreate,inputFieldReplayIndex;
     GameObject networkedClient;
-    GameObject findGameSessionButton, placeHolderGameButton,observerButton;
+    GameObject findGameSessionButton, placeHolderGameButton,observerButton,loadReplayButton;
     GameObject infoText1, infoText2;
     GameObject board;
     private GameObject myChat,
@@ -64,6 +64,10 @@ public class GameManager : MonoBehaviour
                             infoText2 = go;
                         else if (go.name == "ObserverButton")
                             observerButton = go;
+                        else if (go.name == "inputFieldLoadReplay")
+                            inputFieldReplayIndex = go;
+                        else if (go.name == "buttonLoadReplay")
+                            loadReplayButton = go;
                     }
                     
                     buttonSubmit.GetComponent<Button>().onClick.AddListener(SubmitButtonPressed); 
@@ -73,6 +77,7 @@ public class GameManager : MonoBehaviour
                     findGameSessionButton.GetComponent<Button>().onClick.AddListener(FindGameSessionButtonPressed); 
                     placeHolderGameButton.GetComponent<Button>().onClick.AddListener(PlaceHolderGameButtonPressed);
                     observerButton.GetComponent<Button>().onClick.AddListener(ObserverButtonPressed);
+                    loadReplayButton.GetComponent<Button>().onClick.AddListener(LoadReplay);
                     
                     ChangeGameStates(GameStates.login);
         }
@@ -420,6 +425,13 @@ public class GameManager : MonoBehaviour
             enemyChatCounter = 0.0f;
         }
     }
+    
+    public void LoadReplay()
+    {
+        string index = inputFieldReplayIndex.GetComponent<InputField>().text;
+        DataManager.LoadSingleGame(int.Parse(index));
+    }
+
 
     public class Step
     {
@@ -487,9 +499,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
-   
-
+    
     public static class ClientToServerSignifiers
     {
         public const int Login = 1;

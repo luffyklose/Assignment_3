@@ -177,7 +177,7 @@ public class GameRoomManager : MonoBehaviour
         else if (i == (int)GameOverSignifier.ReceiveStepsOver)
         {
             Debug.Log("Create local saving file");
-            //CreateReplayFile();
+            CreateReplayFile();
         }
     }
 
