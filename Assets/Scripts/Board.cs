@@ -70,7 +70,8 @@ public class Board : MonoBehaviour
             }
         }
     }
-
+    
+    /*
     private void MarkBox(Box box)
     {
         if (box.isEmpty)
@@ -115,7 +116,8 @@ public class Board : MonoBehaviour
             SwitchPlayer();
         }
     }
-    
+    */
+
     public void DrawMark(int location, bool isPlayer)
     {
         if (boxStates[location] == BoxState.Empty)

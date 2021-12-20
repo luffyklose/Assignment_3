@@ -17,7 +17,12 @@ public class UI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        uiRestartButton.onClick.AddListener(() => SceneManager.LoadScene(0));
+        uiRestartButton.onClick.AddListener(() =>
+        {
+            SceneManager.LoadScene(0);
+            GameManager tempGameManager = FindObjectOfType<GameManager>();
+            tempGameManager.ChangeGameStates(2);
+        });
         uiReplayBUtton.onClick.AddListener(StartReplay);
         board.OnWinAction += OnWinEvent;
 

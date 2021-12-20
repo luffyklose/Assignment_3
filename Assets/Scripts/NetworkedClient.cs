@@ -138,96 +138,27 @@ public class NetworkedClient : MonoBehaviour
         }
         else if (signifier == ServerToClientSignifiers.OpponentTicTacToePlay)
         {
-            Debug.Log("Our next action no longer beckons");
-            int temp = int.Parse(csv[1]);
-            Debug.Log(temp);
-            if (temp == 1)
-            {
-                canPlay = true;
-            }
-            else if (temp == 0)
-            {
-                canPlay = false;
-            }
-            else
-            {
-                Debug.Log("CanPlay get error");
-            }
-            SceneManager.LoadScene("GameScene");
-            //gameManager.GetComponent<GameManager>().FindGameSceneObject();
-            if (canPlay)
-            {
-                gameManager.GetComponent<GameManager>().FindGameSceneObject();
-                gameManager.GetComponent<GameManager>().getBoard().GetComponent<Board>().EnterPlayerTurn();
-            }
+            GameRoomManager.GetInstance().OpponentTicTacToePlay(msg, id);
         }
         else if (signifier == ServerToClientSignifiers.DrawMark)
         {
-            Debug.Log("Enemy draw mark at box " + csv[1]);
-            gameManager.GetComponent<GameManager>().EnemyDrawMark(int.Parse(csv[1]));
+            GameRoomManager.GetInstance().DrawMark(msg, id);
         }
         else if (signifier == ServerToClientSignifiers.JoiningRoom)
         {
-            int i = int.Parse(csv[1]);
-            if (i == 0)
-            {
-                Debug.Log("Join a room to observe");
-                SceneManager.LoadScene("GameScene");
-                gameManager.GetComponent<GameManager>().FindGameSceneObject();
-            }
-            else if (i == 1)
-            {
-                int location = int.Parse(csv[2]);
-                int temp = int.Parse(csv[3]);
-                BoxState state = BoxState.Empty;
-                if (temp == 0)
-                    state = BoxState.O;
-                else if (temp == 1)
-                    state = BoxState.X;
-                //gameManager.GetComponent<GameManager>().getBoard().GetComponent<Board>().SetBoxMarked(location, state);
-                gameManager.GetComponent<GameManager>().AddStep(location, state);
-            }
-            else if (i == 2)
-            {
-                Debug.Log("get steps finish");
-                gameManager.GetComponent<GameManager>().getBoard().GetComponent<Board>().LoadStep();
-            }
+            GameRoomManager.GetInstance().JoiningRoom(msg, id);
         }
         else if (signifier == ServerToClientSignifiers.NoRoomCanJoin)
         {
-            Debug.Log("No Room can be joined");
+            GameRoomManager.GetInstance().NoRoomCanJoin(msg, id); 
         }
         else if (signifier == ServerToClientSignifiers.DrawMarkOnObserver)
         {
-            int location = int.Parse(csv[1]);
-            int temp = int.Parse(csv[2]);
-            BoxState state = BoxState.Empty;
-            if (temp == 0)
-                state = BoxState.O;
-            else if (temp == 1)
-                state = BoxState.X;
-            gameManager.GetComponent<GameManager>().getBoard().GetComponent<Board>().SetBoxMarked(location, state);
-            Debug.Log("Observer mark " + location + " " + state);
+            GameRoomManager.GetInstance().DrawMarkOnObserver(msg, id);
         }
         else if (signifier == ServerToClientSignifiers.GameOver)
         {
-            int i = int.Parse(csv[1]);
-            if (i == 0)
-            {
-                Debug.Log("Game over, start receive replay data");
-                gameManager.GetComponent<GameManager>().ClearStepList();
-            }
-            else if (i == 1)
-            {
-                int location = int.Parse(csv[2]);
-                int temp = int.Parse(csv[3]);
-                BoxState state = BoxState.Empty;
-                if (temp == 0)
-                    state = BoxState.O;
-                else if (temp == 1)
-                    state = BoxState.X;
-                gameManager.GetComponent<GameManager>().AddStep(location, state);
-            }
+            GameRoomManager.GetInstance().GameOver(msg, id);
         }
         else if (signifier == ServerToClientSignifiers.SendChatMessage)
         {
